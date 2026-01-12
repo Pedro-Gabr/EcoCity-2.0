@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoCity 2.0 - Simulador de Sustentabilidade</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="game-header">
+    <div class="game-title">🌱 EcoCity 2.0</div>
+    <div class="header-actions">
+        <button class="header-btn" id="toggle-left-panel">📊 Painel Esquerdo</button>
+        <button class="header-btn" id="toggle-right-panel">🎯 Painel Direito</button>
+        <button class="header-btn" id="pause-btn">⏸️ Pausar</button>
+    </div>
+</div>
+
+<div class="game-main-container">
+    <!-- Tela Inicial -->
+    <div id="start-screen" class="screen">
+        <div class="eco-icon">🌍</div>
+        <h1>EcoCity 2.0</h1>
+        <p style="font-size: 1.1em; max-width: 800px; line-height: 1.5; margin-bottom: 20px;">
+            Construa e gerencie uma cidade sustentável! Equilibre desenvolvimento econômico com preservação ambiental.
+            Cada decisão afeta o futuro do seu ecossistema.
+        </p>
+        <div style="background: rgba(60, 179, 113, 0.1); padding: 15px; border-radius: 12px; max-width: 800px; margin-top: 15px;">
+            <h3 style="color: #98FB98; margin-bottom: 10px;">🎯 Objetivo do Jogo</h3>
+            <p style="color: #F0F8FF; font-size: 0.9em;">
+                Mantenha a cidade funcionando por 100 dias sem causar colapso ecológico.
+                Gerencie eventos, construa infraestrutura e mantenha a população feliz!
+            </p>
+            <div style="display: flex; justify-content: center; gap: 20px; margin-top: 15px; flex-wrap: wrap;">
+                <div style="text-align: center;">
+                    <div style="font-size: 1.8em;">🏠</div>
+                    <div style="font-size: 0.75em;">Cada casa abriga 100 pessoas</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 1.8em;">🏭</div>
+                    <div style="font-size: 0.75em;">Indústrias criam empregos</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 1.8em;">⚡</div>
+                    <div style="font-size: 0.75em;">Energia para cada construção</div>
+                </div>
+            </div>
+        </div>
+        <button class="btn-large" id="start-btn">🌱 Iniciar Jogo</button>
+    </div>
+
+    <div class="game-container">
+        <!-- Painel Esquerdo -->
+        <aside class="left-panel" id="left-panel">
+            <!-- Status Compacto -->
+            <div class="card">
+                <h3>🏙️ Status da Cidade</h3>
+                <div class="status-compact">
+                    <div class="status-item">
+                        <div class="status-label">Dia</div>
+                        <div id="ui-day" class="status-value">1</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">População</div>
+                        <div id="ui-pop" class="status-value">100</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Semana</div>
+                        <div id="ui-week" class="status-value">1</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Imigrantes</div>
+                        <div id="ui-migrants" class="status-value">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Indicadores -->
+            <div class="card">
+                <h3>📊 Indicadores</h3>
+                <div class="indicators-grid">
+                    <div class="indicator-item money">
+                        <div class="indicator-header">
+                            <div>💰 Orçamento</div>
+                            <div id="ui-money" class="indicator-value">$10,000</div>
+                        </div>
+                        <div class="indicator-progress">
+                            <div id="bar-money" class="indicator-fill" style="width: 50%; background: var(--eco-yellow);"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-item energy">
+                        <div class="indicator-header">
+                            <div>⚡ Energia</div>
+                            <div id="ui-energy" class="indicator-value">100%</div>
+                        </div>
+                        <div class="indicator-progress">
+                            <div id="bar-energy" class="indicator-fill" style="width: 100%; background: var(--eco-blue);"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-item happy">
+                        <div class="indicator-header">
+                            <div>😊 Felicidade</div>
+                            <div id="ui-happy" class="indicator-value">60%</div>
+                        </div>
+                        <div class="indicator-progress">
+                            <div id="bar-happy" class="indicator-fill" style="width: 60%; background: #FF69B4;"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-item pollution">
+                        <div class="indicator-header">
+                            <div>🌫️ Poluição</div>
+                            <div id="ui-pollute" class="indicator-value">10%</div>
+                        </div>
+                        <div class="indicator-progress">
+                            <div id="bar-pollute" class="indicator-fill" style="width: 10%; background: var(--eco-red);"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-item employment">
+                        <div class="indicator-header">
+                            <div>💼 Empregos</div>
+                            <div id="ui-jobs" class="indicator-value">0/0</div>
+                        </div>
+                        <div class="indicator-progress">
+                            <div id="bar-jobs" class="indicator-fill" style="width: 0%; background: var(--eco-purple);"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-item housing">
+                        <div class="indicator-header">
+                            <div>🏠 Habitação</div>
+                            <div id="ui-housing" class="indicator-value">0/0</div>
+                        </div>
+                        <div class="indicator-progress">
+                            <div id="bar-housing" class="indicator-fill" style="width: 0%; background: #3498db;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ações -->
+            <div class="card">
+                <h3>⚙️ Ações</h3>
+                <div class="controls-grid">
+                    <button class="action-btn" id="btn-house">
+                        <div class="btn-icon">🏠</div>
+                        <div>Residencial</div>
+                        <div class="btn-cost">$1,500</div>
+                    </button>
+                    <button class="action-btn" id="btn-factory">
+                        <div class="btn-icon">🏭</div>
+                        <div>Indústria</div>
+                        <div class="btn-cost">$3,000</div>
+                    </button>
+                    <button class="action-btn" id="btn-solar">
+                        <div class="btn-icon">☀️</div>
+                        <div>Solar</div>
+                        <div class="btn-cost">$4,000</div>
+                    </button>
+                    <button class="action-btn" id="btn-park">
+                        <div class="btn-icon">🌳</div>
+                        <div>Parque</div>
+                        <div class="btn-cost">$2,500</div>
+                    </button>
+                    <button class="action-btn" id="btn-recycle">
+                        <div class="btn-icon">♻️</div>
+                        <div>Reciclagem</div>
+                        <div class="btn-cost">$3,500</div>
+                    </button>
+                    <button class="action-btn" id="btn-upgrade">
+                        <div class="btn-icon">⬆️</div>
+                        <div>Melhorar</div>
+                        <div class="btn-cost">Var.</div>
+                    </button>
+                </div>
+                <div style="margin-top: 10px; display: flex; gap: 6px;">
+                    <button class="action-btn" id="btn-tax" style="flex: 1; padding: 8px;">
+                        <div class="btn-icon">💰</div>
+                        <div>Impostos</div>
+                        <div class="cooldown-overlay" id="tax-cooldown" style="display: none;">7 dias</div>
+                    </button>
+                    <button class="action-btn" id="btn-campaign" style="flex: 1; padding: 8px;">
+                        <div class="btn-icon">📢</div>
+                        <div>Campanha</div>
+                        <div class="cooldown-overlay" id="campaign-cooldown" style="display: none;">5 dias</div>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Área Principal do Jogo -->
+        <main class="game-area" id="game-area">
+            <!-- Grid será gerado dinamicamente -->
+            <div class="game-grid" id="game-grid"></div>
+        </main>
+
+        <!-- Painel Direito -->
+        <aside class="right-panel" id="right-panel">
+            <!-- Eventos Temporários -->
+            <div class="card">
+                <h3>📢 Eventos Ativos</h3>
+                <div id="active-events" style="max-height: 200px; overflow-y: auto;">
+                    <div style="text-align: center; padding: 15px; color: #98FB98; font-size: 0.85em;">
+                        Nenhum evento ativo no momento
+                    </div>
+                </div>
+            </div>
+
+            <!-- Missões -->
+            <div class="card" style="flex-grow: 1;">
+                <h3>🎯 Missões</h3>
+                <div id="missions-list" style="overflow-y: auto; max-height: 300px;">
+                    <!-- Missões serão carregadas aqui -->
+                </div>
+            </div>
+
+            <!-- Informações da Semana -->
+            <div class="card">
+                <h3>📅 Semana Atual</h3>
+                <div style="font-size: 0.85em;">
+                    <div style="margin-bottom: 6px;">
+                        <span style="color: #98FB98;">Dia:</span> 
+                        <span id="current-day-info">1/100</span>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                        <span style="color: #98FB98;">Eventos esta semana:</span>
+                        <span id="events-this-week">0/2</span>
+                    </div>
+                    <div>
+                        <span style="color: #98FB98;">Próximos impostos:</span>
+                        <span id="next-tax">7 dias</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Barra de Dias -->
+    <div class="day-bar">
+        <div>Dia: <span id="current-day">1</span>/100</div>
+        <div class="day-progress">
+            <div id="day-fill" class="day-fill" style="width: 1%"></div>
+        </div>
+        <div id="eco-status" style="color: #98FB98;">🌿 Sustentável</div>
+    </div>
+
+    <!-- Info do Dia -->
+    <div class="day-info">
+        Semana <span id="week-number" class="week-indicator">1</span> • 
+        <span id="day-status">Dia de trabalho</span>
+    </div>
+
+    <!-- Indicador de Migrantes -->
+    <div id="migrants-indicator" class="migrants-indicator">
+        <span id="migrants-count">0</span> imigrantes esperando por casas
+    </div>
+
+    <!-- Tela Final -->
+    <div id="end-screen" class="screen hidden">
+        <div class="eco-icon" id="end-icon">🏆</div>
+        <h1 id="end-title">Fim do Jogo</h1>
+        <p id="end-msg" style="font-size: 1.2em; max-width: 800px; line-height: 1.5; margin-bottom: 25px;"></p>
+        <div id="final-stats" class="card" style="width: 90%; max-width: 700px; text-align: left; margin-bottom: 25px;">
+            <h3>📈 Estatísticas Finais</h3>
+            <div id="stats-content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;"></div>
+        </div>
+        <button class="btn-large" id="restart-btn">🔄 Jogar Novamente</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
