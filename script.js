@@ -50,7 +50,6 @@ class Game {
             paused: false,
             gameOver: false,
             score: 0,
-            taxCooldown: 0,
             campaignCooldown: 0,
             eventsThisWeek: 0,
             lastEventDay: 0,
@@ -198,7 +197,6 @@ class Game {
         document.getElementById('btn-park').addEventListener('click', () => this.build('park'));
         document.getElementById('btn-recycle').addEventListener('click', () => this.build('recycle'));
         document.getElementById('btn-upgrade').addEventListener('click', () => this.upgradeSelected());
-        document.getElementById('btn-tax').addEventListener('click', () => this.collectTax());
         document.getElementById('btn-campaign').addEventListener('click', () => this.launchCampaign());
 
         // Scroll na área do jogo
@@ -310,6 +308,7 @@ class Game {
         document.getElementById('current-day-info').textContent = `${this.state.day}/100`;
 
         this.calculateCapacities();
+        this.autoCollectTax();
         this.generateMigrants();
         this.processMigrants();
         this.calculateBuildingEffects();
@@ -361,6 +360,20 @@ class Game {
         const energyNet = this.state.energyProduction - this.state.energyConsumption;
         const energyPercentage = Math.max(0, Math.min(100, (energyNet / Math.max(1, this.state.energyConsumption)) * 100));
         this.state.energy = energyPercentage;
+    }
+
+        autoCollectTax() {
+        // Coleta automática de impostos a cada 7 dias
+        if (this.state.day % 7 === 0 && this.state.day > 0) {
+            const taxRate = 0.12;
+            const taxAmount = Math.floor(this.state.population * taxRate);
+            
+            if (taxAmount > 0) {
+                this.updateResource('money', taxAmount);
+                this.notify(`💰 Impostos coletados automaticamente: $${taxAmount}`);
+                this.spawnFloater(`+$${taxAmount}`, 100, 50, '#FFD700');
+            }
+        }
     }
 
     generateMigrants() {
@@ -710,24 +723,6 @@ class Game {
         }
     }
 
-    collectTax() {
-        if (this.state.taxCooldown > 0) {
-            this.notify(`Impostos só podem ser coletados a cada 7 dias. Aguarde ${this.state.taxCooldown} dias.`, true);
-            return;
-        }
-
-        const taxRate = 0.12;
-        const taxAmount = Math.floor(this.state.population * taxRate);
-        
-        this.updateResource('money', taxAmount);
-        this.state.taxCooldown = this.config.taxCooldown;
-        document.getElementById('tax-cooldown').style.display = 'block';
-        document.getElementById('tax-cooldown').textContent = '7 dias';
-        
-        this.notify(`💰 Impostos coletados: $${taxAmount}`);
-        this.spawnFloater(`+$${taxAmount}`, 100, 50, '#FFD700');
-    }
-
     launchCampaign() {
         if (this.state.campaignCooldown > 0) {
             this.notify(`Campanha só pode ser realizada a cada 5 dias. Aguarde ${this.state.campaignCooldown} dias.`, true);
@@ -813,14 +808,7 @@ class Game {
     }
 
     updateCooldowns() {
-        if (this.state.taxCooldown > 0) {
-            this.state.taxCooldown--;
-            if (this.state.taxCooldown === 0) {
-                document.getElementById('tax-cooldown').style.display = 'none';
-            } else {
-                document.getElementById('tax-cooldown').textContent = `${this.state.taxCooldown} dias`;
-            }
-        }
+        // Removida a lógica de taxCooldown
         
         if (this.state.campaignCooldown > 0) {
             this.state.campaignCooldown--;
@@ -831,8 +819,10 @@ class Game {
             }
         }
         
+        // Calcular dias até a próxima coleta de impostos (a cada 7 dias)
+        const daysUntilNextTax = 7 - (this.state.day % 7);
         document.getElementById('next-tax').textContent = 
-            this.state.taxCooldown > 0 ? `${this.state.taxCooldown} dias` : "Hoje!";
+            daysUntilNextTax === 7 ? "Hoje!" : `${daysUntilNextTax} dias`;
     }
 
     updateActiveEvents() {
@@ -1186,11 +1176,10 @@ class Game {
             btn.disabled = this.state.money < cost;
         });
 
-        const taxBtn = document.getElementById('btn-tax');
         const campaignBtn = document.getElementById('btn-campaign');
-        
-        taxBtn.disabled = this.state.taxCooldown > 0;
         campaignBtn.disabled = this.state.campaignCooldown > 0 || this.state.money < this.config.costs.campaign;
+        
+        // Removido o botão de impostos
     }
 
     notify(message, isError = false, duration = 4000) {
